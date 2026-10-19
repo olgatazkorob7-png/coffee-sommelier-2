@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node dev.mjs",
     "build": "NODE_ENV=production next build && node scripts/postbuild.mjs",
-    "start": "start": "next start",
+    "start": "next start",
     "clean": "rm -rf .next dist",
     "lint": "tsc --noEmit"
   },
