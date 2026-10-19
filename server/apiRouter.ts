@@ -14,10 +14,7 @@ export async function handleChatRequest(body: any) {
     };
   }
 
-  // Generate response from sommelier
   const result = await processSommelierQuery(message, history);
-
-  // Background asynchronous logging without waiting or blocking client
   sendQueryLog(message, result.category, result.source).catch(() => {});
 
   return {

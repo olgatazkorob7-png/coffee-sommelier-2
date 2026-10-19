@@ -8,11 +8,12 @@ import {
   Archive,
   Truck,
   Send,
-  Package,
-  RotateCcw,
-  ArrowUpRight,
   Sparkles,
+  RefreshCw,
+  ShoppingBag,
   ExternalLink,
+  X,
+  Loader2
 } from 'lucide-react';
 import { CATEGORIES, CategoryItem, RecommendedProduct } from '@/lib/coffee-data';
 
@@ -124,8 +125,8 @@ export default function CoffeeSommelierApp() {
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.reply,
-        recommendedProduct: data.recommendedProduct || null,
+        content: data.reply || data.content || '',
+        recommendedProduct: data.recommendedProduct || (data.recommendedProducts && data.recommendedProducts[0]) || null,
         source: data.source || 'из базы',
       };
 
@@ -157,94 +158,94 @@ export default function CoffeeSommelierApp() {
     sendMessage(inputValue);
   };
 
-  const currentCategoryTitle =
-    CATEGORIES.find((c) => c.id === activeCategory)?.title || 'Подбор сорта';
+  const currentCategoryObj = CATEGORIES.find((c) => c.id === activeCategory) || CATEGORIES[0];
 
   return (
-    <main className="min-h-screen lg:h-screen w-full bg-[#FAF8F5] text-[#1C1917] flex flex-col lg:grid lg:grid-cols-[300px_1fr_360px] lg:overflow-hidden">
-      {/* ЗОНА 1 (СЛЕВА): Список категорий */}
-      <aside
-        aria-label="Список категорий"
-        className="w-full bg-[#EBE5D9] border-b lg:border-b-0 lg:border-r border-[#DDD6C8] flex flex-col justify-between p-6 lg:h-full"
-      >
-        <div>
-          <div className="pb-6 mb-6 border-b border-[#DDD6C8]">
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-[#1C1917] whitespace-nowrap">
-              Кофейный сомелье
-            </h1>
-            <p className="mt-1 text-xs text-[#78716C]">
-              Обжарочная «Терруар» · Консультант
-            </p>
+    <main className="min-h-screen lg:h-screen w-full bg-[#FAF8F5] text-[#1C1917] flex flex-col lg:grid lg:grid-cols-[280px_1fr_340px] lg:overflow-hidden">
+      {/* ЛЕВАЯ КОЛОНКА: Категории */}
+      <aside className="border-b lg:border-b-0 lg:border-r border-[#E5E0D5] bg-[#F7F4EE] flex flex-col p-4 lg:overflow-y-auto">
+        <div className="flex items-center gap-2.5 px-2 py-3 mb-3 border-b border-[#E5E0D5]">
+          <div className="w-8 h-8 rounded-lg bg-[#2C1E18] text-[#FAF8F5] flex items-center justify-center shrink-0">
+            <Coffee className="w-4 h-4" />
           </div>
-
-          <div className="mb-3">
-            <h2 className="text-xs font-medium text-[#78716C] px-1">
-              Категории вопросов
-            </h2>
+          <div>
+            <h1 className="text-sm font-bold tracking-tight text-[#1C1917]">Терруар</h1>
+            <p className="text-[11px] text-[#78716C]">Обжарочная мануфактура</p>
           </div>
-
-          <nav className="flex flex-col gap-1.5" aria-label="Категории">
-            {CATEGORIES.map((category) => {
-              const Icon = CATEGORY_ICONS[category.id] || Coffee;
-              const isActive = activeCategory === category.id;
-
-              return (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleCategoryClick(category)}
-                  disabled={isLoading}
-                  className={`w-full text-left px-3.5 py-3 rounded-lg transition-colors duration-150 flex items-start gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2C1E18] disabled:opacity-60 ${
-                    isActive
-                      ? 'bg-[#2C1E18] text-[#FAF8F5]'
-                      : 'text-[#1C1917] hover:bg-[#DFD8CB]'
-                  }`}
-                >
-                  <Icon
-                    className={`w-4 h-4 mt-0.5 shrink-0 ${
-                      isActive ? 'text-[#D6C7B2]' : 'text-[#78716C]'
-                    }`}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium leading-snug truncate">
-                      {category.title}
-                    </div>
-                    <div
-                      className={`text-xs mt-0.5 truncate ${
-                        isActive ? 'text-[#D6C7B2]' : 'text-[#78716C]'
-                      }`}
-                    >
-                      {category.subtitle}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </nav>
         </div>
 
-        <div className="hidden lg:block pt-6 border-t border-[#DDD6C8] text-xs text-[#78716C] leading-relaxed">
-          Нажмите на категорию, чтобы начать подбор, или задайте свой вопрос в диалоге.
+        <div className="text-[11px] font-semibold text-[#78716C] px-2 mb-2 uppercase tracking-wider">
+          Темы консультации
+        </div>
+
+        <nav className="space-y-1.5 flex-1">
+          {CATEGORIES.map((cat) => {
+            const Icon = CATEGORY_ICONS[cat.id] || Coffee;
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategoryClick(cat)}
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-start gap-3 ${
+                  isActive
+                    ? 'bg-[#2C1E18] text-[#FAF8F5] shadow-sm'
+                    : 'bg-transparent text-[#2C1E18] hover:bg-[#EBE6DC]'
+                }`}
+              >
+                <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${isActive ? 'text-[#FAF8F5]' : 'text-[#78716C]'}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-semibold leading-tight">{cat.title}</div>
+                  <div className={`text-[11px] truncate mt-0.5 ${isActive ? 'text-[#D6D3D1]' : 'text-[#78716C]'}`}>
+                    {cat.subtitle}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="mt-4 pt-3 border-t border-[#E5E0D5] px-2">
+          <div className="text-[11px] text-[#78716C] leading-relaxed">
+            Поддержка обжарщика:
+            <span className="block font-medium text-[#2C1E18]">support@terroir-coffee.ru</span>
+          </div>
         </div>
       </aside>
 
-      {/* ЗОНА 2 (ПО ЦЕНТРУ): Окно диалога */}
-      <section
-        aria-label="Окно диалога"
-        className="flex flex-col bg-white min-h-[540px] lg:h-full lg:overflow-hidden"
-      >
-        <header className="px-6 py-4 border-b border-[#DDD6C8] bg-white flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-2 text-sm text-[#57534E] min-w-0">
-            <span className="font-semibold text-[#1C1917] truncate">
-              Диалог с сомелье
-            </span>
-            <span aria-hidden="true" className="text-[#A8A29E]">
-              ·
-            </span>
-            <span className="text-[#78716C] truncate">{currentCategoryTitle}</span>
+      {/* ЦЕНТРАЛЬНАЯ КОЛОНКА: Диалог сомелье */}
+      <section className="flex flex-col flex-1 h-full min-w-0 bg-[#FAF8F5] relative">
+        {/* Заголовок чата */}
+        <header className="px-6 py-4 border-b border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-sm flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <h2 className="text-sm font-semibold text-[#1C1917]">Кофейный сомелье</h2>
+            <span className="text-[#A8A29E]">·</span>
+            <span className="text-xs text-[#78716C]">{currentCategoryObj.title}</span>
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMessages([
+                {
+                  id: 'welcome-reset',
+                  role: 'assistant',
+                  content: 'Здравствуйте! Я готов помочь вам с новым вопросом по кофе, помолу или оборудованию.',
+                  source: 'из базы',
+                },
+              ]);
+              setSelectedProduct(null);
+            }}
+            className="text-xs text-[#78716C] hover:text-[#1C1917] flex items-center gap-1 transition-colors"
+            title="Очистить диалог"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Сброс</span>
+          </button>
         </header>
 
+        {/* Список сообщений */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {messages.map((msg) => {
             const isUser = msg.role === 'user';
@@ -299,17 +300,15 @@ export default function CoffeeSommelierApp() {
               <div className="mb-1 px-1 text-xs text-[#78716C]">
                 Кофейный сомелье
               </div>
-              <div className="bg-white border border-[#DDD6C8] rounded-xl px-5 py-4 text-sm text-[#78716C]">
-                Подбираю ответ по каталогу и базе обжарщика...
+              <div className="bg-white border border-[#E5E0D5] rounded-xl px-5 py-4 text-sm text-[#78716C] flex items-center gap-2">
+                <Loader2 className="w-4 h-4 text-[#2C1E18] animate-spin shrink-0" />
+                <span>Подбираю ответ по каталогу и базе обжарщика...</span>
               </div>
             </div>
           )}
 
           {errorText && (
-            <div
-              role="alert"
-              className="rounded-xl px-4 py-3 bg-[#FEF2F2] border border-[#FECACA] text-xs text-[#991B1B]"
-            >
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs">
               {errorText}
             </div>
           )}
@@ -317,186 +316,144 @@ export default function CoffeeSommelierApp() {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-4 lg:p-6 border-t border-[#DDD6C8] bg-white shrink-0">
-          <form onSubmit={handleFormSubmit} className="flex items-center gap-3">
-            <label htmlFor="sommelier-input" className="sr-only">
-              Ваш вопрос кофейному сомелье
-            </label>
-            <input
-              id="sommelier-input"
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Напишите вопрос о сорте, помоле, подписке или доставке..."
-              disabled={isLoading}
-              className="flex-1 min-w-0 h-11 px-4 rounded-lg bg-white border border-[#D6D1C7] text-sm text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#2C1E18] transition-colors disabled:opacity-60"
-            />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="h-11 px-5 rounded-lg bg-[#2C1E18] text-[#FAF8F5] text-sm font-medium hover:bg-[#3E2B22] transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2C1E18] disabled:opacity-50"
-            >
-              <span>Отправить</span>
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
+        {/* Быстрые подсказки текущей темы */}
+        {currentCategoryObj.sampleQuestions && currentCategoryObj.sampleQuestions.length > 0 && (
+          <div className="px-6 py-2 flex items-center gap-2 overflow-x-auto border-t border-[#E5E0D5] bg-[#FAF8F5]">
+            <span className="text-[11px] text-[#78716C] whitespace-nowrap">Подсказки:</span>
+            {currentCategoryObj.sampleQuestions.map((sq, sqIdx) => (
+              <button
+                key={sqIdx}
+                type="button"
+                onClick={() => sendMessage(sq)}
+                className="text-xs px-2.5 py-1 rounded-full bg-white border border-[#E5E0D5] text-[#2C1E18] hover:bg-[#F4F1EA] transition-colors whitespace-nowrap shrink-0"
+              >
+                {sq}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Поле ввода */}
+        <form onSubmit={handleFormSubmit} className="p-4 border-t border-[#E5E0D5] bg-white flex items-center gap-2">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Спросите о вкусе кофе, помоле, доставке или оборудовании..."
+            className="flex-1 px-4 py-2.5 rounded-xl border border-[#E5E0D5] bg-[#FAF8F5] text-sm text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#2C1E18]/20 focus:border-[#2C1E18] transition-all"
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !inputValue.trim()}
+            className="px-4 py-2.5 rounded-xl bg-[#2C1E18] text-[#FAF8F5] text-sm font-medium hover:bg-[#3E2B22] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <span>Отправить</span>
+            <Send className="w-3.5 h-3.5" />
+          </button>
+        </form>
       </section>
 
-      {/* ЗОНА 3 (СПРАВА): Карточка товара */}
-      <aside
-        aria-label="Карточка товара"
-        className="w-full bg-[#EBE5D9] border-t lg:border-t-0 lg:border-l border-[#DDD6C8] p-6 flex flex-col lg:h-full lg:overflow-y-auto"
-      >
-        <div className="pb-4 mb-6 border-b border-[#DDD6C8] flex items-center justify-between gap-2">
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-[#1C1917] whitespace-nowrap">
-            Карточка товара
-          </h2>
-          {selectedProduct && (
-            <button
-              type="button"
-              onClick={() => setSelectedProduct(null)}
-              className="text-xs text-[#78716C] hover:text-[#1C1917] flex items-center gap-1 transition-colors whitespace-nowrap shrink-0"
-              title="Очистить карточку"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Очистить</span>
-            </button>
-          )}
+      {/* ПРАВАЯ КОЛОНКА: Карточка товара */}
+      <aside className="border-t lg:border-t-0 lg:border-l border-[#E5E0D5] bg-[#F7F4EE] flex flex-col p-5 lg:overflow-y-auto">
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-[#E5E0D5]">
+          <ShoppingBag className="w-4 h-4 text-[#2C1E18]" />
+          <h2 className="text-sm font-bold text-[#1C1917]">Карточка товара</h2>
         </div>
 
-        <div className="bg-white border border-[#DDD6C8] rounded-xl p-5 flex-1 flex flex-col justify-between">
-          {!selectedProduct ? (
-            <div className="flex flex-col h-full justify-between">
+        {selectedProduct ? (
+          <div className="flex flex-col flex-1 justify-between bg-white border border-[#E5E0D5] rounded-2xl p-4 shadow-sm">
+            <div className="space-y-4">
+              <div className="aspect-video w-full rounded-xl bg-[#FAF8F5] border border-[#E5E0D5] flex items-center justify-center text-[#78716C]">
+                <Coffee className="w-10 h-10 text-[#2C1E18] stroke-[1.2]" />
+              </div>
+
               <div>
-                <div className="w-full aspect-4/3 rounded-lg bg-[#FAF8F5] border border-dashed border-[#D6D1C7] flex flex-col items-center justify-center p-6 text-center">
-                  <Package className="w-8 h-8 text-[#A8A29E] stroke-[1.5] mb-2" />
-                  <p className="text-sm font-medium text-[#57534E]">
-                    Карточка товара пуста
-                  </p>
-                  <p className="text-xs text-[#78716C] mt-1 max-w-[220px]">
-                    Попросите сомелье подобрать кофе в диалоге, чтобы увидеть параметры сорта
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#78716C]">
+                  {selectedProduct.country || 'Кофе'}
+                </span>
+                <h3 className="text-base font-bold text-[#1C1917] mt-0.5 leading-snug">
+                  {selectedProduct.name}
+                </h3>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div>
+                  <span className="text-[#78716C] block">Вкусовой профиль:</span>
+                  <p className="font-medium text-[#1C1917] mt-0.5 leading-relaxed">
+                    {selectedProduct.flavorProfile}
                   </p>
                 </div>
 
-                <dl className="mt-6 space-y-4 text-sm">
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Название</dt>
-                    <dd className="mt-1 font-medium text-[#A8A29E]">—</dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Страна</dt>
-                    <dd className="mt-1 text-[#A8A29E]">—</dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Вкусовой профиль</dt>
-                    <dd className="mt-1 text-[#A8A29E]">—</dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Почему подходит</dt>
-                    <dd className="mt-1 text-[#A8A29E]">—</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-[#78716C]">Цена</dt>
-                    <dd className="mt-1 font-[family-name:var(--font-mono)] tabular-nums text-[#A8A29E]">
-                      —
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-[#F0EDE6]">
-                <button
-                  type="button"
-                  disabled
-                  className="w-full py-2.5 px-4 rounded-lg bg-[#FAF8F5] border border-[#DDD6C8] text-xs font-medium text-[#A8A29E] cursor-not-allowed whitespace-nowrap"
-                >
-                  Ссылка на товар недоступна
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <div className="w-full aspect-4/3 rounded-lg bg-[#FAF8F5] border border-[#DDD6C8] flex flex-col items-center justify-center p-6 text-center">
-                  <Coffee className="w-8 h-8 text-[#2C1E18] stroke-[1.5] mb-2" />
-                  <p className="font-[family-name:var(--font-display)] text-lg font-bold text-[#1C1917]">
-                    {selectedProduct.name}
-                  </p>
-                  <p className="text-xs text-[#78716C] mt-1">
-                    Свежая обжарка · {selectedProduct.country}
+                <div>
+                  <span className="text-[#78716C] block">Почему подходит:</span>
+                  <p className="text-[#44403C] mt-0.5 leading-relaxed">
+                    {selectedProduct.whyFits}
                   </p>
                 </div>
-
-                <dl className="mt-6 space-y-4 text-sm">
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Название</dt>
-                    <dd className="mt-1 font-semibold text-[#1C1917]">
-                      {selectedProduct.name}
-                    </dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Страна</dt>
-                    <dd className="mt-1 text-[#1C1917]">{selectedProduct.country}</dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Вкусовой профиль</dt>
-                    <dd className="mt-1 text-[#1C1917] leading-relaxed">
-                      {selectedProduct.flavorProfile}
-                    </dd>
-                  </div>
-                  <div className="pb-3 border-b border-[#F0EDE6]">
-                    <dt className="text-xs text-[#78716C]">Почему подходит</dt>
-                    <dd className="mt-1 text-[#1C1917] leading-relaxed">
-                      {selectedProduct.whyFits}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-[#78716C]">Цена</dt>
-                    <dd className="mt-1 font-[family-name:var(--font-mono)] tabular-nums font-semibold text-base text-[#1C1917]">
-                      {selectedProduct.price}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-[#F0EDE6]">
-                <button
-                  type="button"
-                  onClick={() => setShowDemoModal(true)}
-                  className="w-full py-2.5 px-4 rounded-lg bg-[#2C1E18] text-[#FAF8F5] hover:bg-[#3E2B22] transition-colors text-xs font-medium flex items-center justify-center gap-2 whitespace-nowrap"
-                >
-                  <span>Перейти к товару</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="mt-5 pt-4 border-t border-[#E5E0D5] space-y-3">
+              <div className="flex items-baseline justify-between">
+                <span className="text-xs text-[#78716C]">Цена:</span>
+                <span className="text-lg font-bold text-[#1C1917]">
+                  {typeof selectedProduct.price === 'number'
+                    ? `${selectedProduct.price} ₽`
+                    : selectedProduct.price}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowDemoModal(true)}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#2C1E18] text-[#FAF8F5] hover:bg-[#3E2B22] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+              >
+                <span>Перейти к товару</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-[#E5E0D5] rounded-2xl bg-white/50">
+            <Coffee className="w-8 h-8 text-[#A8A29E] stroke-[1.2] mb-2" />
+            <p className="text-xs font-medium text-[#1C1917]">Товар ещё не выбран</p>
+            <p className="text-[11px] text-[#78716C] mt-1 leading-relaxed">
+              Спросите сомелье о сорте кофе или помоле — здесь появится подробная карточка позиции.
+            </p>
+          </div>
+        )}
       </aside>
 
-      {showDemoModal && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowDemoModal(false)}
-        >
-          <div
-            className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border border-[#DDD6C8]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-[#1C1917] mb-2">
-              Это демо-версия
-            </h3>
-            <p className="text-sm text-[#57534E] leading-relaxed mb-4">
-              Ссылка на товар появится после подключения к реальному магазину. Сейчас это демонстрационный пример для учебного задания.
-            </p>
+      {/* Модальное окно перехода к товару */}
+      {showDemoModal && selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-[#E5E0D5] text-center relative">
             <button
               type="button"
               onClick={() => setShowDemoModal(false)}
-              className="w-full py-2.5 px-4 rounded-lg bg-[#2C1E18] text-[#FAF8F5] hover:bg-[#3E2B22] transition-colors text-sm font-medium"
+              className="absolute top-4 right-4 text-[#78716C] hover:text-[#1C1917]"
             >
-              Понятно
+              <X className="w-4 h-4" />
+            </button>
+            <div className="w-10 h-10 rounded-full bg-[#FAF8F5] border border-[#E5E0D5] flex items-center justify-center mx-auto mb-3">
+              <ShoppingBag className="w-5 h-5 text-[#2C1E18]" />
+            </div>
+            <h3 className="text-base font-bold text-[#1C1917] mb-1">
+              {selectedProduct.name}
+            </h3>
+            <p className="text-xs text-[#78716C] mb-4">
+              {selectedProduct.flavorProfile}
+            </p>
+            <div className="p-3 bg-[#FAF8F5] rounded-xl text-xs text-[#44403C] mb-4 font-mono break-all">
+              {selectedProduct.link}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowDemoModal(false)}
+              className="w-full py-2.5 rounded-xl bg-[#2C1E18] text-[#FAF8F5] text-xs font-semibold hover:bg-[#3E2B22] transition-colors"
+            >
+              Закрыть
             </button>
           </div>
         </div>
